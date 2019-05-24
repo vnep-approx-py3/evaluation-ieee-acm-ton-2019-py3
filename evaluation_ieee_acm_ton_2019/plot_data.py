@@ -76,7 +76,7 @@ class BaselineResultReducer(object):
                     number_of_req_profit = 0
                     number_of_requests = len(ssd[algorithm][scenario_id][exec_id].solution.scenario.requests)
                     for req in ssd[algorithm][scenario_id][exec_id].solution.scenario.requests:
-                        if req.profit > 0.001:
+                        if req.profit > 0:
                             number_of_req_profit += 1
                         if mappings[req].is_embedded:
                             number_of_embedde_reqs += 1
