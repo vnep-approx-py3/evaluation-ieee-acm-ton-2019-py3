@@ -12,13 +12,13 @@ install_requires = [
 ]
 
 setup(
-    name="evaluation-ifip-networking-2018",
+    name="evaluation-ieee-acm-ton-2019",
     # version="0.1",
-    packages=["evaluation_ifip_networking_2018"],
+    packages=["evaluation_ieee_acm_ton_2019"],
     install_requires=install_requires,
     entry_points={
         "console_scripts": [
-            "evaluation-ifip-networking-2018 = evaluation_ifip_networking_2018.cli:cli",
+            "evaluation-ieee-acm-ton-2019 = evaluation_ieee_acm_ton_2019.cli:cli",
         ]
     }
 )

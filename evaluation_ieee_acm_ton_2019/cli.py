@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2016-2018 Matthias Rost, Elias Doehne, Alexander Elvers
+# Copyright (c) 2016-2019 Matthias Rost, Elias Doehne, Alexander Elvers
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ def cli():
     developed by Matthias Rost, Elias Döhne, Alexander Elvers, and Tom Koch.
     In particular, it allows to reproduce the results presented in the paper:
 
-    "Virtual Network Embedding Approximations: Leveraging Randomized Rounding", Matthias Rost and Stefan Schmid, IFIP Networking 2018.
+    "Virtual Network Embedding Approximations: Leveraging Randomized Rounding", Matthias Rost and Stefan Schmid #TODO Publication Name and Year
 
     Note that each commands provides a detailed help page. To access the help, simply type the commmand and --help.
 
