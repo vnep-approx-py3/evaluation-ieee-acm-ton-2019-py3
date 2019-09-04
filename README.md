@@ -1,8 +1,7 @@
 
 # Overview
 
-This repository contains the evaluation code as well as the raw results presented in our paper at IFIP Networking 2018 [1] 
-as well as in the corresonding technical report [2].
+This repository contains the evaluation code as well as the raw results presented in our IEEE/ACM Transactions on Networking paper [1]. 
 
 The implementation of the respective algorithms can be found in our separate python packages: 
 - **[alib](https://github.com/vnep-approx/alib)**, providing for example the data model and the Mixed-Integer Program for the classic multi-commodity formulation), as well as
@@ -21,15 +20,12 @@ to
 
 ## Papers
 
-**[1]** Matthias Rost, Stefan Schmid: Virtual Network Embedding Approximations: Leveraging Randomized Rounding. IFIP Networking 2018.
-
-**[2]** [Matthias Rost, Stefan Schmid: Virtual Network Embedding Approximations: Leveraging Randomized Rounding. CoRR abs/1803.04452](https://arxiv.org/abs/1803.03622) (2018) 
-
-**[3]** Matthias Rost, Stefan Schmid: (FPT-)Approximation Algorithms for the Virtual Network Embedding Problem. [CoRR abs/1803.04452](https://arxiv.org/abs/1803.04452) (2018)
+**[1]** Matthias Rost, Stefan Schmid: Virtual Network Embedding Approximations:
+Leveraging Randomized Rounding. IEEE/ACM Transactions on Networking. 2019 (to appear)
 
 # Dependencies and Requirements
 
-The **vnep_approx** library requires Python 2.7. Required python libraries: gurobipy, numpy, cPickle, networkx, matplotlib, and **[alib](https://github.com/vnep-approx/alib)**, and . 
+The **evaluation_ieee_acm_ton_2019** library requires Python 2.7. Required python libraries: gurobipy, numpy, cPickle, networkx, matplotlib, **[alib](https://github.com/vnep-approx/alib)**, and **[vnep_approx](https://github.com/vnep-approx/vnep-approx)**. 
 
 Gurobi must be installed and the .../gurobi64/lib directory added to the environment variable LD_LIBRARY_PATH.
 
@@ -40,7 +36,7 @@ such that the subfolders input/ output/ and log/ exist.
 
 # Installation
 
-To install **vnep_approx**, we provide a setup script. Simply execute from within vnep_approx's root directory: 
+To install **evaluation_ieee_acm_ton_2019**, we provide a setup script. Simply execute from within evaluation_ifip_networking_2018's root directory: 
 
 ```
 pip install .
@@ -53,7 +49,7 @@ pip install -e .
 When choosing this option, sources are not copied during the installation but the local sources are used: changes to
 the sources are directly reflected in the installed package.
 
-We generally propose to install **vnep_approx** into a virtual environment (together with **alib**).
+We generally propose to install **evaluation_ifip_networking_2018** into a virtual environment (together with **vnep_approx** and **alib**).
 
 # Usage
 

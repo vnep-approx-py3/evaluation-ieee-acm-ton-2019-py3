@@ -1,0 +1,11 @@
+SCENARIO_INPUT_PICKLE: "ieee_acm_ton_2019_scenarios.pickle"
+RESULT_OUTPUT_PICKLE: "ieee_acm_ton_2019_scenarios_solutions_MIP_baseline.pickle"
+
+RUN_PARAMETERS:
+    - ALGORITHM:
+        ID: ClassicMCF
+            
+        GUROBI_PARAMETERS:
+            timelimit: [7200] #maximal runtime of 2 hours
+            threads: [1]      #one thread for gurobi (per scenario)
+            mipGap: [0.01]    #terminate after having reached a solution less than 1% away from the optimum

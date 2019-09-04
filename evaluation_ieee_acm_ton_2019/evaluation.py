@@ -40,7 +40,7 @@ import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 import numpy as np
 
-from alib import solutions, util
+from alib import solutions, util, scenariogeneration
 
 REQUIRED_FOR_PICKLE = solutions  # this prevents pycharm from removing this import, which is required for unpickling solutions
 
@@ -76,8 +76,8 @@ heatmap_specification_obj = dict(
     name="$\\mathrm{MIP}_{\\mathrm{MCF}}$: Objective Gap [%]",
     filename="objective_gap",
     vmin=0.0,
-    vmax=16.0,
-    colorbar_ticks=[x for x in range(0,17,2)],
+    vmax=20.0,
+    colorbar_ticks=[x for x in range(0,21,4)],
     cmap="Blues",
     plot_type=HeatmapPlotType.Simple_MCF,
     lookup_function=lambda mcf_result: mcf_result.status.objGap * 100,
@@ -88,8 +88,8 @@ heatmap_specification_runtime = dict(
     name="$\\mathrm{MIP}_{\\mathrm{MCF}}$: Runtime [min]",
     filename="runtime",
     vmin=0,
-    vmax=180,
-    colorbar_ticks=[x for x in range(0,181,20)],
+    vmax=120,
+    colorbar_ticks=[x for x in range(0,121,15)],
     cmap="Greys",
     plot_type=HeatmapPlotType.Simple_MCF,
     lookup_function=lambda mcf_result: mcf_result.temporal_log.log_entries[-1].globaltime / 60.0,
@@ -116,7 +116,7 @@ heatmap_specification_embedding_ratio_cleaned = dict(
     cmap="Greens",
     plot_type=HeatmapPlotType.Simple_MCF,
     lookup_function=(lambda mcf_result:
-                     ((mcf_result.embedding_ratio * mcf_result.original_number_requests / mcf_result.nu_real_req) * 100) if mcf_result.nu_real_req > 0.5
+                     ((mcf_result.embedding_ratio * mcf_result.original_number_requests / (float(mcf_result.nu_real_req))) * 100) if mcf_result.nu_real_req > 0.5
                      else np.NaN)
 )
 
@@ -145,9 +145,9 @@ heatmap_specification_average_node_load = dict(
 heatmap_specification_average_edge_load = dict(
     name="$\\mathrm{MIP}_{\\mathrm{MCF}}$: Avg. Edge Load [%]",
     filename="avg_edge_load",
-    vmin=0.0,
-    vmax=30,
-    colorbar_ticks=[x for x in range(0,31,5)],
+    vmin=25,
+    vmax=75,
+    colorbar_ticks=[x for x in range(25,76,10)],
     cmap="Purples",
     plot_type=HeatmapPlotType.Simple_MCF,
     lookup_function=lambda mcf_result: compute_average_edge_load(mcf_result),
@@ -201,42 +201,44 @@ heatmap_specification_runtime_randround_preprocessing = dict(
     name="$\\mathrm{LP}_{\\mathrm{novel}}$: Runtime Pre-Processing[s]",
     filename="randround_runtime_pre",
     vmin=0,
-    vmax=60,
-    colorbar_ticks=[x for x in range(0,61,10)],
+    vmax=50,
+    colorbar_ticks=[x for x in range(0,51,10)],
     cmap="Greys",
     plot_type=HeatmapPlotType.Simple_RRT,
     lookup_function=lambda rrt_result: rrt_result.meta_data.time_preprocessing
 )
 
 heatmap_specification_runtime_randround_optimization = dict(
-    name="$\\mathrm{LP}_{\\mathrm{novel}}$: Runtime LP [min]",
+    name="$\\mathrm{LP}_{\\mathrm{novel}}$: Runtime Gurobi [min]",
     filename="randround_runtime_opt",
     vmin=0,
-    vmax=180,
-    colorbar_ticks=[x for x in range(0,181,20)],
+    vmax=5,
+    colorbar_ticks=[x for x in range(0,6,1)],
     cmap="Greys",
     lookup_function=lambda rrt_result: rrt_result.meta_data.time_optimization / 60.0,
     plot_type=HeatmapPlotType.Simple_RRT,
-    rounding_function=lambda x: int(round(x))
+    #rounding_function=lambda x: int(round(x))
+    rounding_function=lambda x: "{0:.2f}".format(x)
 )
 
 heatmap_specification_runtime_randround_postprocessing = dict(
     name="$\\mathrm{LP}_{\\mathrm{novel}}$: Runtime Post-Processing [s]",
     filename="randround_runtime_post",
     vmin=0,
-    vmax=60,
-    colorbar_ticks=[x for x in range(0,61,10)],
+    vmax=180,
+    colorbar_ticks=[x for x in range(0,181,30)],
     cmap="Greys",
     plot_type=HeatmapPlotType.Simple_RRT,
-    lookup_function=lambda rrt_result: rrt_result.meta_data.time_postprocessing
+    lookup_function=lambda rrt_result: rrt_result.meta_data.time_postprocessing,
+    rounding_function=lambda x: int(round(x))
 )
 
 heatmap_specification_runtime_randround_runtime = dict(
     name="$\\mathrm{LP}_{\\mathrm{novel}}$: Total Runtime [min]",
     filename="randround_runtime_total",
     vmin=0,
-    vmax=10,
-    colorbar_ticks=[x for x in range(0,11,2)],
+    vmax=5,
+    colorbar_ticks=[x for x in range(0,6,1)],
     cmap="Greys",
     plot_type=HeatmapPlotType.Simple_RRT,
     lookup_function=lambda rrt_result: (rrt_result.meta_data.time_preprocessing +
@@ -246,26 +248,26 @@ heatmap_specification_runtime_randround_runtime = dict(
 )
 
 heatmap_specification_runtime_mdk_runtime = dict(
-    name="Runtime MDK [s]",
+    name="Runtime MDK [min]",
     filename="mdk_runtime_total",
     vmin=0,
-    vmax=60,
-    colorbar_ticks=[x for x in range(0, 61, 10)],
+    vmax=121,
+    colorbar_ticks=[x for x in range(0, 121, 20)],
     cmap="Greys",
     plot_type=HeatmapPlotType.Simple_RRT,
-    lookup_function=lambda rrt_result: rrt_result.mdk_meta_data.time_preprocessing +
+    lookup_function=lambda rrt_result: (rrt_result.mdk_meta_data.time_preprocessing +
                                        rrt_result.mdk_meta_data.time_optimization +
-                                       rrt_result.mdk_meta_data.time_postprocessing,
+                                       rrt_result.mdk_meta_data.time_postprocessing) / 60.0,
 )
 
 
 heatmap_specification_comparison_baseline_rr_mdk = dict(
-    name="Heuristic Rounding Performance      \n$\mathrm{Profit}({\mathrm{RR}_{\mathrm{MDK}}}) / \mathrm{Profit}({\mathrm{MIP}_{\mathrm{MCF}}})$ [%]     ",
+    name="Optimal Rounding Performance      \n$\mathrm{Profit}({\mathrm{RR}_{\mathrm{MDK}}}) / \mathrm{Profit}({\mathrm{MIP}_{\mathrm{MCF}}})$ [%]     ",
     filename="comparison_baseline_rr_mdk",
-    vmin=50.0,
+    vmin=65.0,
     vmax=100,
-    colorbar_ticks=[x for x in range(50,101,10)],
-    cmap="Reds",
+    colorbar_ticks=[x for x in range(65,101,5)],
+    cmap="Blues",
     plot_type=HeatmapPlotType.Comparison_MCF_vs_RRT,
     lookup_function=lambda mcf_result, rrt_result: (
         (rrt_result.mdk_result.profit / mcf_result.status.objValue) * 100 if mcf_result.status.objValue > 0.000001
@@ -275,10 +277,10 @@ heatmap_specification_comparison_baseline_rr_mdk = dict(
 heatmap_specification_comparison_baseline_rr_heuristic = dict(
     name="Heuristic Rounding Performance      \n$\mathrm{Profit}({\mathrm{RR}_{\mathrm{Heuristic}}}) / \mathrm{Profit}({\mathrm{MIP}_{\mathrm{MCF}}})$ [%]     ",
     filename="comparison_baseline_rr_heuristic",
-    vmin=50.0,
+    vmin=65.0,
     vmax=100,
-    colorbar_ticks=[x for x in range(50,101,10)],
-    cmap="Reds",
+    colorbar_ticks=[x for x in range(65, 101, 5)],
+    cmap="Blues",
     plot_type=HeatmapPlotType.Comparison_MCF_vs_RRT,
     lookup_function=lambda mcf_result, rrt_result: (
         (rrt_result.result_wo_violations.profit / mcf_result.status.objValue) * 100 if mcf_result.status.objValue > 0.000001
@@ -291,7 +293,7 @@ heatmap_specification_comparison_baseline_rr_min_load = dict(
     vmin=95.0,
     vmax=145.0,
     colorbar_ticks=[x for x in range(95,146,10)],
-    cmap="Reds",
+    cmap="Blues",
     plot_type=HeatmapPlotType.Comparison_MCF_vs_RRT,
     lookup_function=lambda mcf_result, rrt_result: (
         (rrt_result.collection_of_samples_with_violations[0].profit / mcf_result.status.objValue) * 100 if mcf_result.status.objValue > 0.000001
@@ -305,7 +307,7 @@ heatmap_specification_comparison_baseline_rr_max_profit = dict(
     vmin=95.0,
     vmax=145.0,
     colorbar_ticks=[x for x in range(95,146,10)],
-    cmap="Reds",
+    cmap="Blues",
     plot_type=HeatmapPlotType.Comparison_MCF_vs_RRT,
     lookup_function=lambda mcf_result, rrt_result: (
         (rrt_result.collection_of_samples_with_violations[1].profit / mcf_result.status.objValue) * 100 if mcf_result.status.objValue > 0.000001
@@ -374,9 +376,36 @@ heatmap_axes_specification_requests_node_load = dict(
     foldername="AXES_NO_REQ_vs_NODE_RF"
 )
 
+heatmap_axes_specification_requests_substrates = dict(
+    x_axis_parameter="number_of_requests",
+    y_axis_parameter="topology",
+    x_axis_title="Number of Requests",
+    y_axis_title="Substrate",
+    foldername="AXES_NO_REQ_vs_SUBSTRATES"
+)
+
+heatmap_axes_specification_edge_rf_substrates = dict(
+    x_axis_parameter="edge_resource_factor",
+    y_axis_parameter="topology",
+    x_axis_title="Edge Resource Factor",
+    y_axis_title="Substrate",
+    foldername="AXES_EDGE_RF_vs_SUBSTRATES"
+)
+
+heatmap_axes_specification_node_rf_substrates = dict(
+    x_axis_parameter="node_resource_factor",
+    y_axis_parameter="topology",
+    x_axis_title="Node Resource Factor",
+    y_axis_title="Substrate",
+    foldername="AXES_NODE_RF_vs_SUBSTRATES"
+)
+
 global_heatmap_axes_specifications = [heatmap_axes_specification_requests_edge_load,
                                       heatmap_axes_specification_resources,
-                                      heatmap_axes_specification_requests_node_load]
+                                      heatmap_axes_specification_requests_node_load,
+                                      heatmap_axes_specification_requests_substrates,
+                                      heatmap_axes_specification_edge_rf_substrates,
+                                      heatmap_axes_specification_node_rf_substrates]
 
 
 def compute_average_node_load(result_summary):
@@ -436,6 +465,46 @@ def compute_max_load(result_summary):
         cum_loads.append(result_summary.load[(x, y)])
     return max(cum_loads)
 
+
+def shortened_topology_name(original_topology_name):
+    if original_topology_name == "Uunet":
+        return "UU"
+    elif original_topology_name == "Surfnet":
+        return "SN"
+    elif original_topology_name == "Geant2012":
+        return "GE"
+    elif original_topology_name == "Ntt":
+        return "NT"
+    elif original_topology_name == "DeutscheTelekom":
+        return "DT"
+    else:
+        return None
+
+_topology_size_dict = {}
+
+
+def lookup_number_of_nodes_in_topology(original_topology_name):
+    if original_topology_name in _topology_size_dict:
+        return _topology_size_dict[original_topology_name]
+    else:
+
+        reader = scenariogeneration.TopologyZooReader()
+
+        raw_parameters = {"topology": original_topology_name,
+                          "node_types": ["universal"],
+                          "node_capacity": 100.0,
+                          "edge_capacity": 100.0,
+                          "node_type_distribution": 1.0}
+
+        path_to_topology  =   os.path.join(scenariogeneration.DATA_PATH, "topologyZoo", original_topology_name + ".yml")
+        print "trying to parse {} ".format(path_to_topology)
+        graph = reader.read_from_yaml(raw_parameters)
+        if graph is not None:
+            _topology_size_dict[original_topology_name] = graph.get_number_of_nodes()
+        else:
+            _topology_size_dict[original_topology_name] = None
+
+        return _topology_size_dict[original_topology_name]
 
 
 def select_scenarios_with_high_objective_gap_or_zero_requests(dc_baseline, algorithm_name,
@@ -762,13 +831,24 @@ class SingleHeatmapPlotter(AbstractPlotter):
         path_x_axis, xaxis_parameters = extract_parameter_range(sps, heatmap_axes_specification['x_axis_parameter'])
         path_y_axis, yaxis_parameters = extract_parameter_range(sps, heatmap_axes_specification['y_axis_parameter'])
 
+
         # for heatmap plot
         xaxis_parameters.sort()
         yaxis_parameters.sort()
 
         # all heatmap values will be stored in X
         X = np.zeros((len(yaxis_parameters), len(xaxis_parameters)))
+
         column_labels = yaxis_parameters
+
+        if "topology" in path_y_axis: #detect whether y-axis is substrates
+            yaxis_parameters.sort(key=lambda x: lookup_number_of_nodes_in_topology(x))
+            actual_labels = []
+            for topology_name in yaxis_parameters:
+                actual_labels.append(shortened_topology_name(topology_name))
+            column_labels = actual_labels
+
+
         row_labels = xaxis_parameters
         fig, ax = plt.subplots(figsize=(5, 4))
 
@@ -1291,7 +1371,7 @@ class ComparisonBaselineVsRRT_Scatter_and_ECDF(AbstractPlotter):
 
         result = self.compute_dual_bound_array(scenario_ids)
 
-        fix, ax = plt.subplots(figsize=(5, 4))
+        fix, ax = plt.subplots(figsize=(10, 4))
         #ax.set_xscale("log", basex=10)
 
         colors = ['k','g', 'b', 'r']
@@ -1355,10 +1435,15 @@ class ComparisonBaselineVsRRT_Scatter_and_ECDF(AbstractPlotter):
 
     def plot_scatter_obj_vs_load(self, filter_specifications):
 
-        bounding_boxes = {'min_aug':      [[50,140],[85,235]],
-                          'max_profit':   [[95,210],[90,505]],
-                          'wo_viol':      [[30  ,105],[75,102]],
-                          'mdk':          [[15,105],[75,102]]}
+        # bounding_boxes = {'min_aug': [[50, 140], [85, 235]],
+        #                   'max_profit': [[95, 210], [90, 505]],
+        #                   'wo_viol': [[30, 105], [75, 102]],
+        #                   'mdk': [[15, 105], [75, 102]]}
+
+        bounding_boxes = {'min_aug': [[50, 140], [85, 275]],
+                          'max_profit': [[90, 225], [30, 625]],
+                          'wo_viol': [[25, 105], [75, 105]],
+                          'mdk': [[25, 125], [50, 105]]}
 
 
         for data_to_plot in self._randround_data_names:
@@ -1496,6 +1581,275 @@ def _construct_filter_specs(scenario_parameter_space_dict, parameter_filter_keys
                 result_list.append(filter)
 
     return result_list
+
+
+def construct_temporal_solution_matrix(dc_baseline,
+                                       baseline_algorithm_id,
+                                       baseline_execution_config,
+                                       dc_randround,
+                                       randround_algorithm_id,
+                                       randround_execution_config):
+    scenario_ids = [scen_id for scen_id in dc_baseline.algorithm_scenario_solution_dictionary[baseline_algorithm_id].keys()]
+    number_of_scenarios = len(scenario_ids)
+    scenario_rows = [scenario_row for scenario_row in range(number_of_scenarios)]
+    #create mapping of scenario ids to rows
+    scenario_row_dict = {scenario_id : row for (scenario_id, row) in zip(scenario_ids, scenario_rows)}
+
+    temporal_resolution = 5
+    timehorizon = 7500
+
+    temporal_dimension = timehorizon / temporal_resolution
+
+    time_indices = zip([index for index in range(temporal_dimension)], [time for time in range(temporal_resolution, timehorizon + temporal_resolution+1, temporal_resolution)])
+
+    baseline_matrix = np.full((number_of_scenarios, temporal_dimension), np.nan)
+    baseline_solutions = [
+        dc_baseline.get_solutions_by_scenario_index(x)[baseline_algorithm_id][baseline_execution_config] for x in
+        scenario_ids]
+
+    for scenario_id, scenario_row in scenario_row_dict.iteritems():
+        solution = baseline_solutions[scenario_row]
+        # handle the solution
+        temporal_log = solution.temporal_log
+        current_solution_value = np.nan
+        if temporal_log.root_relaxation_entry is None:
+            improved_entry_index = 0
+            next_solution_time = temporal_log.improved_entries[0].globaltime
+        else:
+            if temporal_log.root_relaxation_entry.globaltime > temporal_log.improved_entries[0].globaltime:
+                improved_entry_index = 0
+                next_solution_time = temporal_log.improved_entries[0].globaltime
+            else:
+                improved_entry_index = -1
+                next_solution_time = temporal_log.root_relaxation_entry.globaltime
+
+        improved_entries = temporal_log.improved_entries
+        improved_entry_count = len(improved_entries)
+
+        for time_index, time in time_indices:
+            if next_solution_time < time:
+                if improved_entry_index == -1:
+                    current_solution_value = temporal_log.root_relaxation_entry.data.objective_value
+                    improved_entry_index = 0
+
+                while improved_entry_index < improved_entry_count and improved_entries[
+                    improved_entry_index].globaltime < time:
+                    improved_entry_index += 1
+                improved_entry_index -= 1
+                if improved_entry_index >= 0:
+                    current_solution_value = improved_entries[improved_entry_index].data.objective_value
+                improved_entry_index += 1
+                if improved_entry_index < improved_entry_count:
+                    next_solution_time = improved_entries[improved_entry_index].globaltime
+                else:
+                    next_solution_time = timehorizon + temporal_resolution
+
+                if current_solution_value <= 0.0:
+                    current_solution_value = np.nan
+
+            baseline_matrix[scenario_row, time_index] = current_solution_value
+
+    mdk_matrix = np.full((number_of_scenarios, temporal_dimension), np.nan)
+    triumvirat_solutions = [
+        dc_randround.get_solutions_by_scenario_index(x)[randround_algorithm_id][randround_execution_config] for x in
+        scenario_ids]
+
+    for scenario_id, scenario_row in scenario_row_dict.iteritems():
+        solution = triumvirat_solutions[scenario_row]
+        # handle the solution
+        general_meta_data = solution.meta_data
+        time_for_solution = general_meta_data.time_preprocessing + general_meta_data.time_optimization + general_meta_data.time_postprocessing
+
+        temporal_log = solution.mdk_meta_data.temporal_log
+        current_solution_value = np.nan
+
+        if temporal_log.root_relaxation_entry is None:
+            improved_entry_index = 0
+            next_solution_time = temporal_log.improved_entries[0].globaltime + time_for_solution
+        else:
+            if temporal_log.root_relaxation_entry.globaltime > temporal_log.improved_entries[0].globaltime:
+                improved_entry_index = 0
+                next_solution_time = temporal_log.improved_entries[0].globaltime  + time_for_solution
+            else:
+                improved_entry_index = -1
+                next_solution_time = temporal_log.root_relaxation_entry.globaltime  + time_for_solution
+
+        improved_entries = temporal_log.improved_entries
+        improved_entry_count = len(improved_entries)
+
+        for time_index, time in time_indices:
+            if next_solution_time < time:
+                if improved_entry_index == -1:
+                    current_solution_value = temporal_log.root_relaxation_entry.data.objective_value
+                    improved_entry_index = 0
+
+                while improved_entry_index < improved_entry_count and improved_entries[
+                    improved_entry_index].globaltime + time_for_solution < time:
+                    improved_entry_index += 1
+                improved_entry_index -= 1
+                if improved_entry_index >= 0:
+                    current_solution_value = improved_entries[improved_entry_index].data.objective_value
+                improved_entry_index += 1
+                if improved_entry_index < improved_entry_count:
+                    next_solution_time = improved_entries[improved_entry_index].globaltime + time_for_solution
+                else:
+                    next_solution_time = timehorizon + temporal_resolution
+
+                if current_solution_value <= 0.0:
+                    current_solution_value = np.nan
+
+            mdk_matrix[scenario_row, time_index] = current_solution_value
+
+    return baseline_matrix, mdk_matrix, scenario_row_dict, time_indices
+
+def get_best_capacity_observing_solution(dc_baseline,
+                                         baseline_algorithm_id,
+                                         baseline_execution_config,
+                                         dc_randround,
+                                         randround_algorithm_id,
+                                         randround_execution_config):
+    scenario_ids = [scen_id for scen_id in dc_baseline.algorithm_scenario_solution_dictionary[baseline_algorithm_id].keys()]
+    number_of_scenarios = len(scenario_ids)
+
+    scenario_rows = [scenario_row for scenario_row in range(number_of_scenarios)]
+    # create mapping of scenario ids to rows
+    scenario_row_dict = {scenario_id: row for (scenario_id, row) in zip(scenario_ids, scenario_rows)}
+
+    best_solution_row = np.full((number_of_scenarios, 1), np.nan)
+
+    for scenario_id, scenario_row in scenario_row_dict.iteritems():
+
+        baseline_solution = dc_baseline.get_solutions_by_scenario_index(scenario_id)[baseline_algorithm_id][baseline_execution_config]
+        randround_solution = dc_randround.get_solutions_by_scenario_index(scenario_id)[randround_algorithm_id][randround_execution_config]
+
+        solution_values = [baseline_solution.status.objValue,
+                           randround_solution.mdk_result.profit,
+                           randround_solution.result_wo_violations.profit]
+
+        best_solution_row[scenario_row] = max(solution_values)
+
+    return best_solution_row
+
+def qualitative_temporal_comparison(dc_baseline,
+                                    baseline_algorithm_id,
+                                    baseline_execution_config,
+                                    dc_randround,
+                                    randround_algorithm_id,
+                                    randround_execution_config):
+
+    base_mat, mkd_mat, scenario_row_dict, time_indices = construct_temporal_solution_matrix(dc_baseline,
+                                                                         baseline_algorithm_id,
+                                                                         baseline_execution_config,
+                                                                         dc_randround,
+                                                                         randround_algorithm_id,
+                                                                         randround_execution_config)
+
+    best_solution_row = get_best_capacity_observing_solution(dc_baseline,
+                                                             baseline_algorithm_id,
+                                                             baseline_execution_config,
+                                                             dc_randround,
+                                                             randround_algorithm_id,
+                                                             randround_execution_config)
+
+    result_matrix = np.full(base_mat.shape, np.nan)
+
+    for scenario_id, scenario_row in scenario_row_dict.iteritems():
+
+        for time_index, time in time_indices:
+
+            best_solution = best_solution_row[scenario_row]
+
+            base_solution = base_mat[scenario_row, time_index]
+
+            mdk_solution = mkd_mat[scenario_row, time_index]
+
+            result = np.nan
+
+            if np.isnan(base_solution) and np.isnan(mdk_solution):
+                result = np.nan
+            elif np.isnan(base_solution) and not np.isnan(mdk_solution):
+                result = mdk_solution / best_solution
+            elif not np.isnan(base_solution) and np.isnan(mdk_solution):
+                result = - base_solution / best_solution
+            else:
+                result = (mdk_solution - base_solution) / best_solution
+
+            result_matrix[scenario_row, time_index] = result
+
+    sorted_result_matrix = np.sort(result_matrix, axis=0)
+
+    percentiles = ["min","median", "max", 2.5, 5.0, 10.0, 20.0, 80.0, 90.0, 95.0, 97.5]
+
+    number_of_scenarios = base_mat.shape[0]
+
+    percentile_matrix = np.full((len(percentiles), len(time_indices)), np.nan)
+
+    for time_index, time in time_indices:
+
+        nan_count = np.count_nonzero(np.isnan(sorted_result_matrix[:, time_index]))
+        non_nan_count = number_of_scenarios - nan_count
+
+        for percentile_index, percentile in enumerate(percentiles):
+
+            if isinstance(percentile, float):
+                percentile_indicator_row = int(((percentile*0.01)*non_nan_count))
+                percentile_matrix[percentile_index, time_index] = sorted_result_matrix[percentile_indicator_row, time_index]
+            else:
+                if percentile == "min":
+                    percentile_matrix[percentile_index, time_index] = np.nanmin(sorted_result_matrix[:,time_index])
+                elif percentile == "max":
+                    percentile_matrix[percentile_index, time_index] = np.nanmax(sorted_result_matrix[:,time_index])
+                elif percentile == "median":
+                    percentile_indicator_row = int(((50 * 0.01) * non_nan_count))
+                    percentile_matrix[percentile_index, time_index] = sorted_result_matrix[
+                        percentile_indicator_row, time_index]
+
+    return percentiles, percentile_matrix, time_indices
+
+
+def plot_stuff(dc_baseline,
+               baseline_algorithm_id,
+               baseline_execution_config,
+               dc_randround,
+               randround_algorithm_id,
+               randround_execution_config):
+
+    percentiles, percentile_matrix, time_indices = qualitative_temporal_comparison(dc_baseline,
+                                                                                   baseline_algorithm_id,
+                                                                                   baseline_execution_config,
+                                                                                   dc_randround,
+                                                                                   randround_algorithm_id,
+                                                                                   randround_execution_config)
+
+    fix, ax = plt.subplots(figsize=(10, 4))
+
+    colors = ['k', 'k', 'k', 'r', 'g', 'b', 'c', 'c', 'b', 'g', 'r']
+
+    x_values = [time for (time_index, time) in time_indices]
+
+    for percentile_index, percentile in enumerate(percentiles):
+        y_values = percentile_matrix[percentile_index, : ]
+
+
+        if not isinstance(percentile, float):
+            ax.plot(x_values, y_values, color=colors[percentile_index], linestyle="-", label="{}".format(percentile),
+                    linewidth=3)
+        else:
+            ax.plot(x_values, y_values, color=colors[percentile_index], linestyle="-", label="{}".format(percentile),
+                    linewidth=2)
+
+
+    ax.set_title("Temporal Relative Performance: MDK vs MIP", fontsize=17)
+    ax.set_xlabel("Time [s]", fontsize=16)
+    ax.set_ylabel("Relative Profit: (MDK[t] - MIP[t])/best", fontsize=16)
+
+    plt.legend()
+
+    ax.set_xscale("log", basex=10)
+    ax.grid(True, which="both", linestyle=":")
+
+    plt.show()
+
 
 def evaluate_baseline_and_randround(dc_baseline,
                                     baseline_algorithm_id,
