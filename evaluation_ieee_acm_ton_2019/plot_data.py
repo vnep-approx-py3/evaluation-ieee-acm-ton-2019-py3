@@ -61,11 +61,11 @@ class BaselineResultReducer(object):
             solution = pickle.load(input_file)
 
         ssd = solution.algorithm_scenario_solution_dictionary
-        for algorithm in ssd.keys():
+        for algorithm in ssd:
             logger.info(".. Reducing results of algorithm {}".format(algorithm))
-            for scenario_id in ssd[algorithm].keys():
+            for scenario_id in ssd[algorithm]:
                 logger.info("   .. handling scenario {}".format(scenario_id))
-                for exec_id in ssd[algorithm][scenario_id].keys():
+                for exec_id in ssd[algorithm][scenario_id]:
                     params, scenario = solution.scenario_parameter_container.scenario_triple[scenario_id]
                     load = dict([((u, v), 0.0) for (u, v) in scenario.substrate.edges])
                     for u in scenario.substrate.nodes:
@@ -80,10 +80,10 @@ class BaselineResultReducer(object):
                             number_of_req_profit += 1
                         if mappings[req].is_embedded:
                             number_of_embedde_reqs += 1
-                            for i, u in mappings[req].mapping_nodes.iteritems():
+                            for i, u in mappings[req].mapping_nodes.items():
                                 node_demand = req.get_node_demand(i)
                                 load[(req.get_type(i), u)] += node_demand
-                            for ve, sedge_list in mappings[req].mapping_edges.iteritems():
+                            for ve, sedge_list in mappings[req].mapping_edges.items():
                                 edge_demand = req.get_edge_demand(ve)
                                 for sedge in sedge_list:
                                     load[sedge] += edge_demand
@@ -138,17 +138,17 @@ class RandRoundResultReducer(object):
         sss.scenario_parameter_container.scenario_list = None
         sss.scenario_parameter_container.scenario_triple = None
 
-        for alg, scenario_solution_dict in sss.algorithm_scenario_solution_dictionary.iteritems():
+        for alg, scenario_solution_dict in sss.algorithm_scenario_solution_dictionary.items():
             logger.info(".. Reducing results of algorithm {}".format(alg))
-            for sc_id, ex_param_solution_dict in scenario_solution_dict.iteritems():
+            for sc_id, ex_param_solution_dict in scenario_solution_dict.items():
                 logger.info("   .. handling scenario {}".format(sc_id))
-                for ex_id, solution in ex_param_solution_dict.iteritems():
+                for ex_id, solution in ex_param_solution_dict.items():
                     compressed = self.reduce_single_solution(solution)
                     ex_param_solution_dict[ex_id] = compressed
 
         logger.info("Writing result pickle to {}".format(reduced_randround_solutions_output_pickle_path))
         with open(os.path.join(reduced_randround_solutions_output_pickle_path),
-                  "w") as f:
+                  "wb") as f:
             pickle.dump(sss, f)
         logger.info("All done.")
 

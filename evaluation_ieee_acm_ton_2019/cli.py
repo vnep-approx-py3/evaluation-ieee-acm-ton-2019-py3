@@ -49,8 +49,8 @@ def cli():
     pass
 
 def initialize_logger(filename, log_level_print, log_level_file, allow_override=False):
-    log_level_print = logging._levelNames[log_level_print.upper()]
-    log_level_file = logging._levelNames[log_level_file.upper()]
+    log_level_print = logging._nameToLevel[log_level_print.upper()]
+    log_level_file = logging._nameToLevel[log_level_file.upper()]
     util.initialize_root_logger(filename, log_level_print, log_level_file, allow_override=allow_override)
 
 @cli.command(short_help="pretty print contents of pickle file")
@@ -64,7 +64,7 @@ def pretty_print(pickle_file, col_output_limit):
     """
     data = pickle.load(pickle_file)
     pp = util.PrettyPrinter()
-    print pp.pprint(data, col_output_limit=col_output_limit)
+    print(pp.pprint(data, col_output_limit=col_output_limit))
 
 @cli.command(short_help="generate scenarios according to yaml specification")
 @click.argument('yaml_parameter_file', type=click.File('r'))
