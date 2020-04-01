@@ -15,26 +15,26 @@ function move_logs_and_output() {
 }
 
 #generate scenarios
-python -m evaluation_ifip_networking_2018.cli generate_scenarios sample_scenarios.yml sample_scenarios.pickle
+python -m evaluation_ifip_networking_2018.cli generate-scenarios sample_scenarios.yml sample_scenarios.pickle
 move_logs_and_output
 
 #run multi-commodity flow mixed-integer program
-python -m evaluation_ifip_networking_2018.cli start_experiment sample_mip_execution.yml 0 10000 --concurrent 2
+python -m evaluation_ifip_networking_2018.cli start-experiment sample_mip_execution.yml 0 10000 --concurrent 2 --remove_intermediate_solutions
 move_logs_and_output
 
 #run randomized rounding algorithms
-python -m evaluation_ifip_networking_2018.cli start_experiment sample_randround_execution.yml 0 10000 --concurrent 2
+python -m evaluation_ifip_networking_2018.cli start-experiment sample_randround_execution.yml 0 10000 --concurrent 2 --remove_intermediate_solutions
 move_logs_and_output
 
 #extract data to be plotted
-python -m evaluation_ifip_networking_2018.cli reduce_to_plotdata_baseline_pickle sample_scenarios_results_mip.pickle 
+python -m evaluation_ifip_networking_2018.cli reduce-to-plotdata-baseline-pickle sample_scenarios_results_mip.pickle
 move_logs_and_output
-python -m evaluation_ifip_networking_2018.cli reduce_to_plotdata_randround_pickle sample_scenarios_results_randround.pickle
+python -m evaluation_ifip_networking_2018.cli reduce-to-plotdata-randround-pickle sample_scenarios_results_randround.pickle
 move_logs_and_output
 
 #generate plots in folder ./plots
 mkdir -p ./plots
-python -m evaluation_ifip_networking_2018.cli evaluate_results sample_scenarios_results_mip_reduced.pickle sample_scenarios_results_randround_reduced.pickle ./plots --overwrite --output_filetype png --non-papermode  --filter_max_depth 0
+python -m evaluation_ifip_networking_2018.cli evaluate-results sample_scenarios_results_mip_reduced.pickle sample_scenarios_results_randround_reduced.pickle ./plots --overwrite --output_filetype png --non-papermode  --filter_max_depth 0
 
 
 

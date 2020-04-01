@@ -13,8 +13,8 @@ request_generation:
             iterations: [10000]
             fix_root_mapping: [False]
             fix_leaf_mapping: [False]
-            node_resource_factor: [0.2, 0.4]     	#2
-            edge_resource_factor: [0.25, 0.5]    	#2
+            node_resource_factor: [0.2, 0.4]     #2
+            edge_resource_factor: [0.25, 0.5]    #2
             arbitrary_edge_orientations: [True]
             normalize: [True]
 
